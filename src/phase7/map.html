@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🗺️ 时空地图 - HelloAgents</title>
+    <style>
+        :root {
+            --doraemon-blue: #00a0e9;
+            --doraemon-dark: #0077b3;
+            --sky-blue: #e8f4fc;
+            --card-bg: rgba(255, 255, 255, 0.92);
+            --text-primary: #333;
+            --text-secondary: #666;
+            --walking-color: #2196F3;
+            --driving-color: #F44336;
+            --accent-green: #4CAF50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            background: url('assets/bg_doraemon_2.png') center center / cover no-repeat fixed;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(135, 206, 235, 0.3);
+            z-index: -1;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding: 15px;
+        }
+
+        /* 顶部栏 */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo img {
+            width: 45px;
+            height: 45px;
+        }
+
+        .logo h1 {
+            font-size: 1.3rem;
+            color: var(--doraemon-blue);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: var(--doraemon-blue);
+            color: white;
+        }
+
+        /* 主内容区 - 三列布局 */
+        .main-content {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+        }
+
+        /* 左侧面板 */
+        .left-panel {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* 右侧面板 */
+        .right-panel {
+            width: 280px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* 卡片通用样式 */
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .card h3 {
+            font-size: 0.95rem;
+            color: var(--doraemon-blue);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 路线输入卡片 */
+        .route-card {
+            flex-shrink: 0;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .input-wrapper input:focus {
+            border-color: var(--doraemon-blue);
+            box-shadow: 0 0 0 3px rgba(0, 160, 233, 0.15);
+        }
+
+        .tips-panel {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            max-height: 180px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1000;
+            margin-top: 4px;
+        }
+
+        .tips-panel.active {
+            display: block;
+        }
+
+        .tip-item {
+            padding: 10px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .tip-item:hover {
+            background: #f5f9fc;
+        }
+
+        .tip-item .name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .tip-item .address {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 2px;
+        }
+
+        .plan-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--doraemon-blue), var(--doraemon-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            box-shadow: 0 4px 12px rgba(0, 160, 233, 0.3);
+            transition: all 0.2s;
+        }
+
+        .plan-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 160, 233, 0.4);
+        }
+
+        /* 定位卡片 */
+        .location-card .content {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .locate-btn {
+            margin-top: 10px;
+            padding: 8px 14px;
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        /* 中间地图区 */
+        .map-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .map-container {
+            width: 100%;
+            max-width: 700px;
+            aspect-ratio: 1;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            border: 3px solid var(--doraemon-blue);
+        }
+
+        #amapContainer {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 日志卡片 */
+        .log-card {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .log-list {
+            list-style: none;
+            flex: 1;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .log-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        /* 路线统计卡片 */
+        .stats-card {
+            background: linear-gradient(135deg, #ffffff, #f8fcff);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        .stat-box.walking {
+            background: rgba(33, 150, 243, 0.1);
+            border: 2px solid rgba(33, 150, 243, 0.3);
+        }
+
+        .stat-box.driving {
+            background: rgba(244, 67, 54, 0.1);
+            border: 2px solid rgba(244, 67, 54, 0.3);
+        }
+
+        .stat-box .icon {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+
+        .stat-box .label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .stat-box .value {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-top: 4px;
+        }
+
+        .stat-box.walking .value {
+            color: var(--walking-color);
+        }
+
+        .stat-box.driving .value {
+            color: var(--driving-color);
+        }
+
+        .straight-distance {
+            text-align: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px dashed #ddd;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .straight-distance .val {
+            font-weight: bold;
+            color: var(--doraemon-blue);
+        }
+
+        /* 图例 */
+        .legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.8rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-line {
+            width: 25px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .legend-line.walking {
+            background: var(--walking-color);
+        }
+
+        .legend-line.driving {
+            background: var(--driving-color);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- 顶部栏 -->
+        <header class="top-bar">
+            <div class="logo">
+                <img src="assets/doraemon.png" alt="Logo">
+                <h1>HelloAgents 时空地图</h1>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html">💬 指挥中心</a>
+                <a href="map.html" class="active">🗺️ 时空地图</a>
+            </nav>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 左侧面板 -->
+            <aside class="left-panel">
+                <!-- 路线规划 -->
+                <div class="card route-card">
+                    <h3>🗺️ 路线规划</h3>
+                    <div class="input-group">
+                        <label>📍 起点</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="startInput" placeholder="输入起点地址" autocomplete="off">
+                            <div class="tips-panel" id="startTips"></div>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>🏁 终点</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="endInput" placeholder="输入终点地址" autocomplete="off">
+                            <div class="tips-panel" id="endTips"></div>
+                        </div>
+                    </div>
+                    <button class="plan-btn" id="planBtn">🚀 开始规划</button>
+
+                    <div class="legend">
+                        <div class="legend-item">
+                            <span class="legend-line walking"></span>
+                            <span>步行</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-line driving"></span>
+                            <span>驾车</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 定位 -->
+                <div class="card location-card">
+                    <h3>📍 当前位置</h3>
+                    <div class="content" id="currentLocation">点击下方按钮获取位置</div>
+                    <button class="locate-btn" id="locateBtn">🔄 获取定位</button>
+                </div>
+            </aside>
+
+            <!-- 中间地图 -->
+            <div class="map-wrapper">
+                <div class="map-container">
+                    <div id="amapContainer"></div>
+                </div>
+            </div>
+
+            <!-- 右侧面板 -->
+            <aside class="right-panel">
+                <!-- 路线统计 -->
+                <div class="card stats-card">
+                    <h3>📊 路线统计</h3>
+                    <div class="stats-grid">
+                        <div class="stat-box walking">
+                            <div class="icon">🚶</div>
+                            <div class="label">步行</div>
+                            <div class="value" id="walkDist">--</div>
+                            <div class="label" id="walkTime">--</div>
+                        </div>
+                        <div class="stat-box driving">
+                            <div class="icon">🚗</div>
+                            <div class="label">驾车</div>
+                            <div class="value" id="driveDist">--</div>
+                            <div class="label" id="driveTime">--</div>
+                        </div>
+                    </div>
+                    <div class="straight-distance">
+                        直线距离: <span class="val" id="straightDist">--</span>
+                    </div>
+                </div>
+
+                <!-- 操作日志 -->
+                <div class="card log-card">
+                    <h3>📋 操作日志</h3>
+                    <ul class="log-list" id="mapLog">
+                        <li>🎯 地图模块加载中...</li>
+                    </ul>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- 高德地图 -->
+    <script>
+        window._AMapSecurityConfig = {
+            securityJsCode: '8acf0c4b0bedb5541a65c6dc36c2ad5a'
+        }
+    </script>
+    <script
+        src="https://webapi.amap.com/maps?v=2.0&key=184789846a618b81596246627830a9c4&plugin=AMap.Geolocation,AMap.PlaceSearch,AMap.AutoComplete,AMap.Walking,AMap.Driving"></script>
+    <script>
+        // ===== 变量 =====
+        let map, userLocation;
+        let startLocation = null, endLocation = null;
+        let walkingRoute = null, drivingRoute = null;
+
+        const logEl = document.getElementById('mapLog');
+        const locationEl = document.getElementById('currentLocation');
+
+        function log(msg) {
+            const li = document.createElement('li');
+            li.textContent = msg;
+            logEl.insertBefore(li, logEl.firstChild);
+            if (logEl.children.length > 15) logEl.removeChild(logEl.lastChild);
+        }
+
+        // ===== 初始化地图 =====
+        function initMap() {
+            log('初始化地图...');
+            map = new AMap.Map('amapContainer', {
+                zoom: 12,
+                center: [116.397, 39.909],
+                mapStyle: 'amap://styles/normal'
+            });
+            map.addControl(new AMap.Scale());
+            log('✅ 地图加载完成');
+        }
+
+        // ===== 定位 =====
+        document.getElementById('locateBtn').onclick = function () {
+            log('正在获取定位...');
+            if (!navigator.geolocation) {
+                locationEl.innerHTML = '❌ 浏览器不支持定位';
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    userLocation = [pos.coords.longitude, pos.coords.latitude];
+                    locationEl.innerHTML = `✅ 已定位<br><small>经度: ${pos.coords.longitude.toFixed(4)}<br>纬度: ${pos.coords.latitude.toFixed(4)}</small>`;
+                    log('✅ 定位成功');
+                    map.setCenter(userLocation);
+                    map.setZoom(14);
+
+                    new AMap.Marker({
+                        position: userLocation,
+                        map: map,
+                        icon: 'https://webapi.amap.com/theme/v1.3/markers/n/mark_r.png'
+                    });
+                },
+                (err) => {
+                    locationEl.innerHTML = `❌ 定位失败: ${err.message}`;
+                    log('❌ 定位失败');
+                },
+                { timeout: 10000, enableHighAccuracy: true }
+            );
+        };
+
+        // ===== 自动补全 =====
+        function setupAutocomplete(inputId, tipsId, onSelect) {
+            const inputEl = document.getElementById(inputId);
+            const tipsEl = document.getElementById(tipsId);
+            const auto = new AMap.AutoComplete({ city: '北京' });
+
+            let timer;
+            inputEl.oninput = function () {
+                const kw = this.value.trim();
+                clearTimeout(timer);
+                if (kw.length < 2) { tipsEl.classList.remove('active'); return; }
+
+                timer = setTimeout(() => {
+                    auto.search(kw, (status, result) => {
+                        if (status === 'complete' && result.tips) {
+                            const valid = result.tips.filter(t => t.location);
+                            if (valid.length) {
+                                tipsEl.innerHTML = valid.slice(0, 5).map(t => `
+                                    <div class="tip-item" data-lng="${t.location.lng}" data-lat="${t.location.lat}" data-name="${t.name}">
+                                        <div class="name">${t.name}</div>
+                                        <div class="address">${t.district || ''} ${t.address || ''}</div>
+                                    </div>
+                                `).join('');
+                                tipsEl.classList.add('active');
+                            }
+                        }
+                    });
+                }, 300);
+            };
+
+            tipsEl.onclick = function (e) {
+                const item = e.target.closest('.tip-item');
+                if (item) {
+                    const loc = [parseFloat(item.dataset.lng), parseFloat(item.dataset.lat)];
+                    inputEl.value = item.dataset.name;
+                    tipsEl.classList.remove('active');
+                    onSelect(loc, item.dataset.name);
+                    log('📍 选择: ' + item.dataset.name);
+                }
+            };
+
+            document.addEventListener('click', e => {
+                if (!inputEl.contains(e.target) && !tipsEl.contains(e.target)) {
+                    tipsEl.classList.remove('active');
+                }
+            });
+        }
+
+        setupAutocomplete('startInput', 'startTips', (loc, name) => {
+            startLocation = loc;
+            new AMap.Marker({ position: loc, map: map, label: { content: '起', direction: 'top' } });
+        });
+
+        setupAutocomplete('endInput', 'endTips', (loc, name) => {
+            endLocation = loc;
+            new AMap.Marker({ position: loc, map: map, label: { content: '终', direction: 'top' } });
+        });
+
+        // ===== 计算直线距离 =====
+        function getStraightDistance(p1, p2) {
+            const lnglat1 = new AMap.LngLat(p1[0], p1[1]);
+            const lnglat2 = new AMap.LngLat(p2[0], p2[1]);
+            return lnglat1.distance(lnglat2);
+        }
+
+        // ===== 路线规划 =====
+        document.getElementById('planBtn').onclick = function () {
+            const start = startLocation || userLocation;
+            const end = endLocation;
+
+            if (!start) { log('⚠️ 请选择起点'); return; }
+            if (!end) { log('⚠️ 请选择终点'); return; }
+
+            log('🔄 正在规划路线...');
+
+            // 清除旧路线
+            if (walkingRoute) walkingRoute.clear();
+            if (drivingRoute) drivingRoute.clear();
+
+            // 计算直线距离
+            const straight = getStraightDistance(start, end);
+            document.getElementById('straightDist').textContent = (straight / 1000).toFixed(2) + ' km';
+            log('📐 直线距离: ' + (straight / 1000).toFixed(2) + ' km');
+
+            // 步行路线 (蓝色) - 使用自定义颜色
+            let walkPolyline = null;
+            walkingRoute = new AMap.Walking({ map: null }); // 不自动渲染
+            walkingRoute.search(
+                new AMap.LngLat(start[0], start[1]),
+                new AMap.LngLat(end[0], end[1]),
+                (status, result) => {
+                    if (status === 'complete') {
+                        const r = result.routes[0];
+                        document.getElementById('walkDist').textContent = (r.distance / 1000).toFixed(2) + ' km';
+                        document.getElementById('walkTime').textContent = Math.ceil(r.time / 60) + ' 分钟';
+                        log('🚶 步行: ' + (r.distance / 1000).toFixed(2) + 'km, ' + Math.ceil(r.time / 60) + '分钟');
+
+                        // 提取路径点并画蓝色线
+                        const path = [];
+                        r.steps.forEach(step => {
+                            path.push(...step.path);
+                        });
+
+                        if (walkPolyline) map.remove(walkPolyline);
+                        walkPolyline = new AMap.Polyline({
+                            path: path,
+                            strokeColor: '#2196F3', // 蓝色
+                            strokeWeight: 6,
+                            strokeOpacity: 0.9,
+                            lineJoin: 'round'
+                        });
+                        map.add(walkPolyline);
+                    }
+                }
+            );
+
+            // 驾车路线 (红色) - 使用自定义颜色
+            let drivePolyline = null;
+            drivingRoute = new AMap.Driving({ map: null, policy: AMap.DrivingPolicy.LEAST_TIME }); // 不自动渲染
+            drivingRoute.search(
+                new AMap.LngLat(start[0], start[1]),
+                new AMap.LngLat(end[0], end[1]),
+                (status, result) => {
+                    if (status === 'complete') {
+                        const r = result.routes[0];
+                        document.getElementById('driveDist').textContent = (r.distance / 1000).toFixed(2) + ' km';
+                        document.getElementById('driveTime').textContent = Math.ceil(r.time / 60) + ' 分钟';
+                        log('🚗 驾车: ' + (r.distance / 1000).toFixed(2) + 'km, ' + Math.ceil(r.time / 60) + '分钟');
+
+                        // 提取路径点并画红色线
+                        const path = [];
+                        r.steps.forEach(step => {
+                            path.push(...step.path);
+                        });
+
+                        if (drivePolyline) map.remove(drivePolyline);
+                        drivePolyline = new AMap.Polyline({
+                            path: path,
+                            strokeColor: '#F44336', // 红色
+                            strokeWeight: 5,
+                            strokeOpacity: 0.8,
+                            lineJoin: 'round',
+                            strokeStyle: 'solid'
+                        });
+                        map.add(drivePolyline);
+
+                        // 调整视野显示两条路线
+                        map.setFitView([walkPolyline, drivePolyline]);
+                    }
+                }
+            );
+        };
+
+        window.onload = initMap;
+    </script>
+</body>
+
+</html>

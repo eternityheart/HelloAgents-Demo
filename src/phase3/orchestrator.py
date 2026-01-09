@@ -49,7 +49,7 @@ class SimpleOrchestrator:
             print(f"❌ LLM 调用失败: {e}")
             return {"type": "response", "content": "大脑暂时短路了...", "thought": "API Error"}
 
-    def chat(self, user_input: str):
+    def chat(self, user_input: str) -> str:
         """主循环：接收用户输入 -> 思考 -> (行动) -> 回复"""
         
         # 1. 将用户输入加入记忆
@@ -66,17 +66,18 @@ class SimpleOrchestrator:
         
         if msg_type == "tool_call":
             # ---> 进入工具调用流程
-            self._handle_tool_call(data)
+            return self._handle_tool_call(data)
             
         elif msg_type == "response":
             # ---> 直接回复
             response_obj = AgentResponse(**data)
-            self._handle_response(response_obj)
+            return self._handle_response(response_obj)
             
         else:
             print("⚠️ 未知消息类型，忽略")
+            return "Error: Unknown message type"
 
-    def _handle_tool_call(self, data: dict):
+    def _handle_tool_call(self, data: dict) -> str:
         """处理工具调用逻辑"""
         try:
             # 1. 解析校验
@@ -114,17 +115,20 @@ class SimpleOrchestrator:
             
             if final_data.get("type") == "response":
                 final_resp = AgentResponse(**final_data)
-                self._handle_response(final_resp)
+                return self._handle_response(final_resp)
             else:
                 print("⚠️ 工具执行后 LLM 没有返回 response 类型")
+                return "Error: No response after tool execution"
                 
         except Exception as e:
             print(f"❌ 工具执行流程出错: {e}")
+            return f"Error: Tool execution failed - {e}"
 
-    def _handle_response(self, response: AgentResponse):
+    def _handle_response(self, response: AgentResponse) -> str:
         """处理直接回复"""
         print(f"🤔 Thought: {response.thought}")
         print(f"🤖 Agent: {response.content}")
         
         # 将回复加入记忆
         self.messages.append({"role": "assistant", "content": response.content})
+        return response.content

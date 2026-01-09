@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 HelloAgents - 哆啦A梦时空指挥中心</title>
+    <link rel="stylesheet" href="doraemon.css">
+</head>
+
+<body>
+    <!-- 背景层 -->
+    <div class="bg-layer">
+        <div class="bg-image"></div>
+        <div class="bg-overlay"></div>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="container">
+        <!-- 顶部导航栏 -->
+        <header class="top-bar">
+            <div class="logo">
+                <img src="assets/doraemon.png" alt="Doraemon" class="logo-icon">
+                <div class="logo-text">
+                    <h1>HelloAgents</h1>
+                    <span class="subtitle">时空指挥中心</span>
+                </div>
+            </div>
+            <nav class="nav-links">
+                <a href="index.html" class="active">💬 指挥中心</a>
+                <a href="map.html">🗺️ 时空地图</a>
+            </nav>
+            <div class="status-indicator">
+                <span class="status-dot online"></span>
+                <span>任意门已就绪</span>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 左侧: 对话区 -->
+            <section class="chat-section">
+                <div class="chat-header">
+                    <div class="chat-header-left">
+                        <img src="assets/shizuka.png" alt="Shizuka" class="chat-header-avatar">
+                        <h2>时空通讯</h2>
+                    </div>
+                    <span class="badge">实时</span>
+                </div>
+                <div class="chat-messages" id="chatMessages">
+                    <!-- 欢迎消息 -->
+                    <div class="welcome-box">
+                        <img src="assets/doraemon.png" alt="Doraemon" class="welcome-avatar">
+                        <div class="welcome-content">
+                            <h3>欢迎来到时空指挥中心！</h3>
+                            <p>我是哆啦A梦，你的AI助手。告诉我你想去哪里、想吃什么，我会调度我的小伙伴们帮你搞定！</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 右侧: Agent 面板 -->
+            <aside class="agent-panel">
+                <div class="panel-header">
+                    <h2>🤖 时空小队</h2>
+                </div>
+
+                <!-- 哆啦A梦 - 总指挥 -->
+                <div class="agent-card" id="agent-concierge" data-agent="concierge">
+                    <img src="assets/doraemon.png" alt="Doraemon" class="agent-avatar">
+                    <div class="agent-info">
+                        <h3>哆啦A梦</h3>
+                        <p class="agent-role">总指挥官</p>
+                        <div class="agent-status">
+                            <span class="status-dot idle"></span>
+                            <span class="status-text">待命</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 大雄 - 侦察兵 (Scout) -->
+                <div class="agent-card" id="agent-scout" data-agent="scout">
+                    <img src="assets/nobita.png" alt="Nobita" class="agent-avatar">
+                    <div class="agent-info">
+                        <h3>大雄</h3>
+                        <p class="agent-role">侦察兵 (Scout)</p>
+                        <div class="agent-status">
+                            <span class="status-dot idle"></span>
+                            <span class="status-text">待命</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 静香 - 气象员 -->
+                <div class="agent-card" id="agent-meteorologist" data-agent="meteorologist">
+                    <img src="assets/shizuka.png" alt="Shizuka" class="agent-avatar">
+                    <div class="agent-info">
+                        <h3>静香</h3>
+                        <p class="agent-role">气象员</p>
+                        <div class="agent-status">
+                            <span class="status-dot idle"></span>
+                            <span class="status-text">待命</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 哆啦美 - 后勤 -->
+                <div class="agent-card" id="agent-support" data-agent="support">
+                    <img src="assets/dorami.png" alt="Dorami" class="agent-avatar">
+                    <div class="agent-info">
+                        <h3>哆啦美</h3>
+                        <p class="agent-role">后勤支援</p>
+                        <div class="agent-status">
+                            <span class="status-dot idle"></span>
+                            <span class="status-text">待命</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 任务日志 -->
+                <div class="task-log">
+                    <h3>📋 任务日志</h3>
+                    <ul id="taskLog">
+                        <li class="log-item">时空小队已集结完毕</li>
+                    </ul>
+                </div>
+            </aside>
+        </main>
+
+        <!-- 底部输入区 -->
+        <footer class="input-section">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="告诉哆啦A梦你想做什么... (例如: 帮我找北京最好吃的烤鸭)" autocomplete="off">
+                <button id="sendBtn" class="send-btn">
+                    <span class="btn-text">🚀 出发</span>
+                    <span class="btn-loading">
+                        <div class="spinner"></div>
+                    </span>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
