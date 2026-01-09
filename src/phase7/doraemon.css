@@ -1,0 +1,667 @@
+/* ========================================
+   哆啦A梦主题 - 时空指挥中心
+   Theme: Doraemon Time-Space Command Center
+   ======================================== */
+
+/* ===== CSS 变量 ===== */
+:root {
+    /* 哆啦A梦配色 */
+    --doraemon-blue: #00a0e9;
+    --doraemon-blue-dark: #0088cc;
+    --sky-blue: #87ceeb;
+    --cloud-white: #ffffff;
+    --nobita-yellow: #ffd700;
+    --shizuka-pink: #ffb6c1;
+    --grass-green: #90ee90;
+
+    /* 主题色 */
+    --bg-primary: #e8f4fc;
+    --bg-gradient: linear-gradient(180deg, #87ceeb 0%, #e8f4fc 50%, #ffffff 100%);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --card-border: rgba(0, 160, 233, 0.3);
+    --text-primary: #333333;
+    --text-secondary: #666666;
+
+    /* 字体 */
+    --font-main: 'Comic Sans MS', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+}
+
+/* ===== 全局重置 ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    height: 100%;
+    font-family: var(--font-main);
+    color: var(--text-primary);
+    overflow: hidden;
+}
+
+/* ===== 背景层 ===== */
+.bg-layer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.bg-image {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: url('assets/bg_doraemon_1.jpg') center center / cover no-repeat;
+}
+
+.bg-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    /* 蓝天渐变叠加 */
+    background: linear-gradient(180deg,
+            rgba(135, 206, 235, 0.4) 0%,
+            rgba(232, 244, 252, 0.6) 50%,
+            rgba(255, 255, 255, 0.7) 100%);
+}
+
+/* ===== 主容器 ===== */
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 15px;
+    gap: 15px;
+}
+
+/* ===== 卡片样式 ===== */
+.card {
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--card-border);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 160, 233, 0.15);
+}
+
+/* ===== 顶部导航栏 ===== */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--card-border);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 160, 233, 0.2);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-icon {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+.logo-text h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--doraemon-blue);
+    text-shadow: 2px 2px 0 rgba(255, 255, 255, 0.8);
+}
+
+.logo-text .subtitle {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+}
+
+.nav-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.95rem;
+    padding: 8px 16px;
+    border-radius: 20px;
+    transition: all 0.3s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+    background: var(--doraemon-blue);
+    color: white;
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-dot.online {
+    background: #00cc66;
+    animation: pulse 2s infinite;
+}
+
+.status-dot.idle {
+    background: #999;
+}
+
+.status-dot.working {
+    background: var(--nobita-yellow);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 204, 102, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(0, 204, 102, 0);
+    }
+}
+
+/* ===== 主内容区 ===== */
+.main-content {
+    display: flex;
+    gap: 15px;
+    flex: 1;
+    min-height: 0;
+}
+
+/* ===== 对话区 ===== */
+.chat-section {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    /* 使用 bg_doraemon_4 作为聊天背景 */
+    background: url('assets/bg_doraemon_4.png') center center / cover no-repeat;
+    /* 增加白色半透明遮罩确保文字清晰 */
+    box-shadow: inset 0 0 0 2000px rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(5px);
+    border: 2px solid var(--card-border);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 2px solid var(--card-border);
+    background: rgba(0, 160, 233, 0.05);
+}
+
+.chat-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.chat-header-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+}
+
+.chat-header h2 {
+    font-size: 1.1rem;
+    color: var(--doraemon-blue);
+    margin: 0;
+}
+
+.badge {
+    background: var(--doraemon-blue);
+    color: white;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 10px;
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 欢迎消息 */
+.welcome-box {
+    display: flex;
+    gap: 16px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(0, 160, 233, 0.1), rgba(135, 206, 235, 0.2));
+    border-radius: 16px;
+    border: 2px dashed var(--doraemon-blue);
+}
+
+.welcome-avatar {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    animation: wave 1s ease-in-out infinite alternate;
+}
+
+@keyframes wave {
+    0% {
+        transform: rotate(-5deg);
+    }
+
+    100% {
+        transform: rotate(5deg);
+    }
+}
+
+.welcome-content h3 {
+    color: var(--doraemon-blue);
+    margin-bottom: 8px;
+}
+
+.welcome-content p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+/* 消息行 (包含头像和气泡) */
+.message-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    max-width: 85%;
+    animation: fade-in 0.3s ease-out;
+}
+
+.message-row.user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.message-row.agent {
+    align-self: flex-start;
+}
+
+/* 消息头像 */
+.message-avatar {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: 2px solid white;
+    background: white;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    flex-shrink: 0;
+}
+
+/* 消息气泡 */
+.message-bubble {
+    padding: 14px 18px;
+    border-radius: 18px;
+    position: relative;
+    line-height: 1.5;
+    word-break: break-word;
+}
+
+.user .message-bubble {
+    background: var(--doraemon-blue);
+    color: white;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 4px 10px rgba(0, 160, 233, 0.2);
+}
+
+.agent .message-bubble {
+    background: white;
+    color: var(--text-primary);
+    border: 2px solid var(--card-border);
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.thinking .message-bubble {
+    background: rgba(255, 215, 0, 0.1);
+    border: 2px solid var(--nobita-yellow);
+    font-style: italic;
+    color: #666;
+}
+
+.tool-call .message-bubble {
+    background: rgba(144, 238, 144, 0.1);
+    border: 2px solid var(--grass-green);
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #444;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== Agent 面板 ===== */
+.agent-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 280px;
+}
+
+.panel-header {
+    padding: 12px 16px;
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 16px;
+}
+
+.panel-header h2 {
+    font-size: 1rem;
+    color: var(--doraemon-blue);
+}
+
+/* Agent 卡片 */
+.agent-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px;
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.agent-card:hover {
+    transform: translateX(5px);
+    border-color: var(--doraemon-blue);
+    box-shadow: 0 4px 15px rgba(0, 160, 233, 0.3);
+}
+
+.agent-card.active {
+    border-color: var(--grass-green);
+    box-shadow: 0 0 20px rgba(144, 238, 144, 0.4);
+}
+
+.agent-avatar {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+    border-radius: 50%;
+    background: white;
+    padding: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.agent-info {
+    flex: 1;
+}
+
+.agent-info h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.agent-role {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.agent-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.status-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* 任务日志 */
+.task-log {
+    flex: 1;
+    padding: 14px;
+    background: var(--card-bg);
+    border: 2px solid var(--card-border);
+    border-radius: 16px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.task-log h3 {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    color: var(--doraemon-blue);
+}
+
+.task-log ul {
+    list-style: none;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.log-item {
+    font-size: 0.8rem;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+    animation: fade-in 0.3s ease-out;
+}
+
+.log-item::before {
+    content: '▸ ';
+    color: var(--doraemon-blue);
+}
+
+/* ===== 输入区 ===== */
+.input-section {
+    padding: 16px 24px;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    border: 2px solid var(--card-border);
+    border-radius: 20px;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 12px;
+}
+
+#userInput {
+    flex: 1;
+    padding: 14px 20px;
+    border: 2px solid var(--card-border);
+    border-radius: 25px;
+    background: white;
+    color: var(--text-primary);
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+#userInput:focus {
+    border-color: var(--doraemon-blue);
+    box-shadow: 0 0 0 3px rgba(0, 160, 233, 0.2);
+}
+
+#userInput::placeholder {
+    color: #999;
+}
+
+.send-btn {
+    padding: 14px 28px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, var(--doraemon-blue), var(--doraemon-blue-dark));
+    color: white;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 160, 233, 0.4);
+}
+
+.send-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 160, 233, 0.5);
+}
+
+.send-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.send-btn .btn-loading {
+    display: none;
+}
+
+.send-btn.loading .btn-text {
+    display: none;
+}
+
+.send-btn.loading .btn-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ===== 滚动条美化 ===== */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 160, 233, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 160, 233, 0.5);
+}
+
+/* ===== 响应式设计 ===== */
+@media (max-width: 900px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .agent-panel {
+        flex-direction: row;
+        flex-wrap: wrap;
+        min-width: 100%;
+    }
+
+    .panel-header {
+        width: 100%;
+    }
+
+    .agent-card {
+        flex: 1;
+        min-width: 200px;
+    }
+
+    .task-log {
+        width: 100%;
+        max-height: 150px;
+    }
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+
+    .top-bar {
+        padding: 10px 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .nav-links {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .logo-text h1 {
+        font-size: 1.2rem;
+    }
+
+    .input-wrapper {
+        flex-direction: column;
+    }
+
+    .send-btn {
+        width: 100%;
+    }
+}
