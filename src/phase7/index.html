@@ -59,9 +59,47 @@
                 </div>
             </section>
 
-            <!-- 右侧: Agent 面板 -->
+            <!-- 右侧: Agent 面板 + 规划表单 -->
             <aside class="agent-panel">
-                <div class="panel-header">
+                <!-- 模式切换 -->
+                <div class="mode-toggle">
+                    <button id="chatModeBtn" class="mode-btn active">💬 对话模式</button>
+                    <button id="planModeBtn" class="mode-btn">📋 规划模式</button>
+                </div>
+
+                <!-- 行程规划表单 (默认隐藏) -->
+                <div id="planForm" class="plan-form hidden">
+                    <h3>🗺️ 多日行程规划</h3>
+                    <div class="form-group">
+                        <label>目的地</label>
+                        <input type="text" id="destinationInput" placeholder="例如: 北京">
+                    </div>
+                    <div class="form-group">
+                        <label>天数</label>
+                        <select id="daysSelect">
+                            <option value="1">1天</option>
+                            <option value="2">2天</option>
+                            <option value="3" selected>3天</option>
+                            <option value="5">5天</option>
+                            <option value="7">7天</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>偏好标签</label>
+                        <div class="tags-container">
+                            <label class="tag-item"><input type="checkbox" value="历史"> 🏛️ 历史</label>
+                            <label class="tag-item"><input type="checkbox" value="美食"> 🍜 美食</label>
+                            <label class="tag-item"><input type="checkbox" value="自然"> 🌿 自然</label>
+                            <label class="tag-item"><input type="checkbox" value="购物"> 🛍️ 购物</label>
+                        </div>
+                    </div>
+                    <button id="generateBtn" class="generate-btn">🚀 生成行程</button>
+
+                    <!-- 行程结果展示区 -->
+                    <div id="itineraryResult" class="itinerary-result hidden"></div>
+                </div>
+
+                <div class="panel-header" id="agentPanelHeader">
                     <h2>🤖 时空小队</h2>
                 </div>
 
