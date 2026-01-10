@@ -299,5 +299,135 @@ userInput.addEventListener('keydown', (e) => {
     }
 });
 
+// ===== 模式切换 =====
+const chatModeBtn = document.getElementById('chatModeBtn');
+const planModeBtn = document.getElementById('planModeBtn');
+const planForm = document.getElementById('planForm');
+const agentPanelHeader = document.getElementById('agentPanelHeader');
+const generateBtn = document.getElementById('generateBtn');
+const destinationInput = document.getElementById('destinationInput');
+const daysSelect = document.getElementById('daysSelect');
+const itineraryResult = document.getElementById('itineraryResult');
+
+// 模式切换事件
+if (chatModeBtn && planModeBtn) {
+    chatModeBtn.addEventListener('click', () => {
+        chatModeBtn.classList.add('active');
+        planModeBtn.classList.remove('active');
+        planForm.classList.add('hidden');
+        agentPanelHeader.style.display = 'block';
+        // 显示agent cards
+        document.querySelectorAll('.agent-card').forEach(card => card.style.display = 'flex');
+    });
+
+    planModeBtn.addEventListener('click', () => {
+        planModeBtn.classList.add('active');
+        chatModeBtn.classList.remove('active');
+        planForm.classList.remove('hidden');
+        agentPanelHeader.style.display = 'none';
+        // 隐藏agent cards
+        document.querySelectorAll('.agent-card').forEach(card => card.style.display = 'none');
+    });
+}
+
+// ===== 行程生成 =====
+if (generateBtn) {
+    generateBtn.addEventListener('click', async () => {
+        const destination = destinationInput.value.trim();
+        const days = parseInt(daysSelect.value);
+        const preferences = [...document.querySelectorAll('.tags-container input:checked')]
+            .map(c => c.value);
+
+        if (!destination) {
+            alert('请输入目的地！');
+            return;
+        }
+
+        // 禁用按钮
+        generateBtn.disabled = true;
+        generateBtn.textContent = '⏳ 生成中...';
+        itineraryResult.classList.add('hidden');
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/itinerary`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ destination, days, preferences })
+            });
+
+            if (!response.ok) throw new Error('API 请求失败');
+
+            const data = await response.json();
+            displayItinerary(data);
+
+        } catch (error) {
+            console.error('Error:', error);
+            alert(`生成失败: ${error.message}`);
+        } finally {
+            generateBtn.disabled = false;
+            generateBtn.textContent = '🚀 生成行程';
+        }
+    });
+}
+
+// ===== 展示行程结果 =====
+function displayItinerary(data) {
+    itineraryResult.classList.remove('hidden');
+
+    let html = '';
+
+    // 概述
+    if (data.summary) {
+        html += `<div class="itinerary-summary">${data.summary}</div>`;
+    }
+
+    // 每日行程卡片
+    for (const day of data.itinerary || []) {
+        html += `
+            <div class="day-card">
+                <h4>📅 第${day.day}天 ${day.date || ''}</h4>
+                <div class="weather-tip">🌤️ ${day.weather_tip || day.weather}</div>
+                
+                <div class="activity-section">
+                    <strong>🌅 上午:</strong>
+                    <span class="activity-list">${day.morning?.map(p => p.name).join('、') || '自由活动'}</span>
+                </div>
+                
+                <div class="activity-section">
+                    <strong>🌇 下午:</strong>
+                    <span class="activity-list">${day.afternoon?.map(p => p.name).join('、') || '自由活动'}</span>
+                </div>
+                
+                ${day.dinner ? `
+                <div class="activity-section">
+                    <strong>🍽️ 晚餐:</strong>
+                    <span class="activity-list">${day.dinner.name}</span>
+                </div>` : ''}
+                
+                ${day.hotel ? `
+                <div class="activity-section">
+                    <strong>🏨 住宿:</strong>
+                    <span class="activity-list">${day.hotel.name}</span>
+                </div>` : ''}
+            </div>
+        `;
+    }
+
+    // 旅行贴士
+    if (data.tips && data.tips.length > 0) {
+        html += `
+            <div class="tips-section">
+                <h4>📌 旅行贴士</h4>
+                <ul>
+                    ${data.tips.map(t => `<li>${t}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    itineraryResult.innerHTML = html;
+}
+
 // 启动
 window.onload = init;
+
